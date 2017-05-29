@@ -7,33 +7,23 @@ var fs=require("fs");
 var request = require("request");
 
 //more requires, first twitter api, spotify, omdb
-var twitter = require("twitter");
+var Twitter = require("twitter");
 var spotify = require('spotify');
 var omdb = require('omdb');
 
 //read the twitter keys from key.js file
 var twitter_keys = require("./keys.js");
-//var random_text = require("./random.txt")
-
-//guess this is built in
-// function Twitter(consumer_key, consumer_secret, access_token_key, access_token_secret) {
-//     this.consumer_key = consumer_key;
-//     this.consumer_secret = consumer_secret;
-//     this.access_token_key = access_token_key;
-//     this.access_token_secret = access_token_secret;
-// }
 
 //what does the user want?
 var command =  process.argv[2];
 
 //requested my-tweets
 function my_tweets() {
+
     var tweet_start = 0;
     var tweet_end = 0;
     var tweet_count = 20;
     console.log("Show at most my last "+ tweet_count +" tweets");
-
-    var Twitter = require('twitter');
 
     var client = new Twitter({
         consumer_key: twitter_keys.twitterkeys.consumer_key,
@@ -76,6 +66,7 @@ function my_tweets() {
 
 //requested spotify-this-song
 function spotify_this_song() {
+
     console.log("Here is your spotify song information");
 
     if (process.argv.length < 4) {
@@ -142,36 +133,44 @@ function movie_this() {
 
 
 function do_what_it_says() {
+
     console.log("Do what you said");
 
      fs.readFile("random.txt", "utf8", function(error, data) {
 
-         // If the code experiences any errors it will log the error to the console.
-         if (error) {
-             return console.log(error);
-         }
+        // If the code experiences any errors it will log the error to the console.
+        if (error) {
+            return console.log(error);
+        }
 
-         // Then split it by commas (to make it more readable)
-         var sayings = data.split(",");
-         command = sayings[0];
-         param_3 = sayings[1];
-         process.argv[3] = param_3.replace(/"/g,"");
-         
-console.log(sayings[0]);
-console.log(sayings[1]);
-console.log(process.argv[3]);
+        // Then split it by commas (to make it more readable)
+        var sayings = data.split(",");
+        command = sayings[0];
+        param_3 = "";
 
-         switch (command) {
-             case "my-tweets":
-                 my_tweets();
-                 break;
-             case "spotify-this-song":
-                 spotify_this_song();
-                 break;
-             case "movie-this":
-                 movie_this();
-                 break;
-         }
+        if (sayings[1].length >= 0) {
+        for ( var i = 0; i < sayings[1].length; i++) {
+            var x = sayings[1].substr(i,1);
+            if (x.charCodeAt()>=32) {
+                param_3+=x;
+            }
+        }
+        process.argv[3] = param_3.replace(/"/g,"");
+        }
+
+        switch (command) {
+            case "my-tweets":
+                my_tweets();
+                break;
+            case "spotify-this-song":
+                spotify_this_song();
+                break;
+            case "movie-this":
+                movie_this();
+                break;
+            default:
+                console.log(command + " is invalid");
+        }
 
      });
 
@@ -193,4 +192,3 @@ switch(command) {
     default:
         console.log(command + " is invalid");
 }
-
